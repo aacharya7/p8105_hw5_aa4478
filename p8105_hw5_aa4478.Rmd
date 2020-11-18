@@ -22,7 +22,7 @@ options(
 scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
-## Problem 1
+## Problem 1 - Homicides in 50 Large U.S. Cities
 ### Read in and clean data
 
 ```{r cars}
@@ -78,3 +78,59 @@ results_df %>%
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
+
+## Problem 2 - Longitudional Study
+```{r}
+data_1 = read_csv("long_data/con_01.csv")
+```
+### Tidying data
+```{r, message = FALSE}
+path_df = 
+  tibble(
+    path = list.files("long_data")
+  ) %>% 
+  mutate(
+    path = str_c("long_data/", path),
+    data = map(path, read_csv)) %>% 
+  unnest(data) %>%
+  separate(path, into = c("folder", "arm"), sep = 9) %>%
+  separate(arm, into = c("arm", "id"), sep = "_") %>% 
+  separate(id, into = c("id", "na"), sep = 2) %>% 
+  select(-folder, -na) %>% 
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week", 
+    values_to = "observation",
+    names_prefix = "week_"
+  ) %>%
+  mutate(
+    id = str_remove(id, "^0+"),
+    week = as.numeric(week),
+    subject_id = str_c(arm, id, sep = "_")
+    ) %>% 
+  select(-id)
+
+path_df
+```
+
+### Creating spaghetti plot
+```{r, message = FALSE}
+path_df %>% 
+  ggplot(aes(x = week, y = observation, color = arm, group = subject_id)) +
+  geom_path() +
+  labs(
+    title = "Observations for subject over time",
+    x = "Week", 
+    y = "Observation"
+  )
+```
+This graph shows us that the subjects in the experimental arm had more observations than subjects in the control arm. 
+In the beginning of the study, the observations are more similar between the experimental and control, and as the weeks go on, they diverge. Also, it appears that the observations for the experimental arm are decreasing over time, 
+
+
+
+
+
+## Problem 3 - False Null Hypothesis 
+
+
