@@ -22,10 +22,11 @@ options(
 scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
-## Problem 1 - Read and clean the data 
+## Problem 1
+### Read in and clean data
 
 ```{r cars}
-homicide_data = 
+homicide_df = 
   read.csv("./data/homicide-data.csv") %>%
   mutate(
     resolved = case_when(
@@ -39,9 +40,9 @@ homicide_data =
   filter(city_state !="Tulsa AL")
 ```
 
-Aggregate
+###Aggregate
 ```{r}
-agg_df = 
+aggregate_df = 
   homicide_data %>% 
   group_by(city_state) %>% 
   summarize(
@@ -49,8 +50,13 @@ agg_df =
     hom_unsolved = sum(resolved == "unsolved")
   )
 ```
-
-
+### Prop Test for Baltimore
+```{r}
+prop.test(
+  aggregate_df %>% filter(city_state == "Baltimore_MD") %>% pull(hom_unsolved),
+    aggregate_df %>% filter(city_state == "Baltimore_MD") %>% pull(hom_total)) %>% 
+  broom::tidy()
+```
 
 
 
