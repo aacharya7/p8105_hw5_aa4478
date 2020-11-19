@@ -176,4 +176,77 @@ rep_sim %>%
 ```
 As we can see from this plot, the power of the test increases as the true mean increases, further away from 0. 
 
+### Plot of the average estimate of μ̂  on the y axis and the true value of μ on the x axis.
+```{r}
+all = 
+ data %>% 
+    group_by(true_mu) %>% 
+    summarize(
+      all_mean = mean(estimate)
+    )
+all %>%   
+  ggplot(aes(x = true_mu, y = all_mean)) +
+    geom_point() +
+    geom_smooth(se = FALSE) +
+    labs(
+      title = "Comparing true mu to average estimated mu",
+      x = "True mu value",
+      y = "Average estimated mu value"
+    )
+```
+
+### Make a second plot (or overlay on the first) the average estimate of μ̂  only in samples for which the null was rejected on the y axis and the true value of μ on the x axis.
+```{r}
+all_samples = 
+  rep_sim %>%
+  select(mean, estimate, p.value) %>% 
+    group_by(mean) %>% 
+    summarize(all = mean(estimate))
+
+rejected_null = 
+  rep_sim %>%
+  select(mean, estimate, p.value) %>% 
+    filter(p.value <= 0.05) %>% 
+    group_by(mean) %>% 
+    summarize(reject_null = mean(estimate))
+```
+```{r}
+left_join(all_samples, rejected_null, by = "mean") %>% 
+  pivot_longer(
+    all:reject_null,
+    names_to = "sample",
+    values_to = "average_estimate"
+  ) %>% 
+  ggplot(aes(x = mean, y = average_estimate, color = sample)) +
+  geom_line() +
+  labs(
+    title = "Average estimate of µ versus true µ",
+    x = "True µ",
+    y = "Average Estimate of µ"
+  )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
