@@ -161,4 +161,19 @@ rep_sim %>%
   select(mean, estimate, p.value)
 ```
 ### Plot of proportion of times the null was rejected 
+```{r}
+rep_sim %>% 
+  select(mean, estimate, p.value) %>% 
+  group_by(mean) %>% 
+  summarize(prop_reject = sum(p.value <= 0.05) / n()) %>% 
+  ggplot(aes(x = mean, y = prop_reject, fill = mean)) +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Proportion of Times Null was Rejected Given True µ",
+    x = "True µ",
+    y = "Power of Test"
+  )
+```
+As we can see from this plot, the power of the test increases as the true mean increases, further away from 0. 
+
 
